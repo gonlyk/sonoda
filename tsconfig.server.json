@@ -1,0 +1,14 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "module": "CommonJS",
+      "outDir": "dist",
+      "lib": ["ESNext"],
+      "target": "es2019",
+      "isolatedModules": false,
+      "noEmit": false,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true
+    },
+    "include": ["server.ts", "server/**/*.ts", "type/**/*.ts", "initdb.ts", "**/*.d.ts"]
+  }
