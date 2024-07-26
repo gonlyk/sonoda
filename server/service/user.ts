@@ -1,7 +1,8 @@
 import md5 from "md5"
-import { SonodaUser, getUser, getUserByName, getUsers, insertUser, updateUser } from "../model/user"
+import { SonodaUser, getUser, getUserByName, getUserCount, getUsers, insertUser, updateUser } from "../model/user"
 import { Context } from "../../shared/koaContext"
 import { BaseService } from "./baseService"
+import { ResourceNotExistError } from "../exception"
 
 export class SonodaUserService extends BaseService {
     createUser(ctx: Context) {
@@ -10,27 +11,33 @@ export class SonodaUserService extends BaseService {
             userEntity.name = name
             userEntity.nickname = nickname
             userEntity.password = md5(password)
+            userEntity.createUser = ctx.state.user
+            userEntity.updateUser = ctx.state.user
             const user = await insertUser(ctx)(userEntity)
             return user
         }
     }
 
     updateUser(ctx: Context) {
-        return async (id: number, nickname: string, password: string, dataActive?: boolean) => {
+        return async (id: number, nickname?: string, password?: string, dataActive?: boolean) => {
             const userEntity = new SonodaUser()
-            userEntity.nickname = nickname
-            userEntity.password = md5(password)
-            userEntity.dataActive = !!dataActive
             userEntity.id = id
+            userEntity.nickname = nickname
+            userEntity.password = password ? md5(password) : void 0
+            userEntity.dataActive = dataActive
+            userEntity.updateUser = ctx.state.user
             const user = await updateUser(ctx)(userEntity)
+            if (!user?.id) {
+              throw new ResourceNotExistError('SonodaUserService.updateUser fail, user not exist')
+            }
             return user
         }
     }
 
     getUsers(ctx: Context) {
-        return async (page?: number, pageSize?: number) => {
-            const users = await getUsers(ctx)(page, pageSize)
-            return users
+        return async (page?: number, pageSize?: number): Promise<[SonodaUser[], number]> => {
+            const [users, count] = await Promise.all([getUsers(ctx)(page, pageSize), getUserCount(ctx)()])
+            return [users, count]
         }
     }
 

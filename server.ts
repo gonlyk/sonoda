@@ -1,20 +1,16 @@
 import 'reflect-metadata'
 import bodyparser from 'koa-bodyparser'
-import next from "next";
-import { getConfig } from "./server/utils/readConfig";
+import { getConfig } from "./utils/readConfig";
 import { initDb } from "./server/db";
-import { dev } from "./server/utils/env";
+import { dev } from "./utils/env";
 import Koa from 'koa'
 import { apiRouter } from "./server/router";
-import Result, { ResultCode } from './server/utils/result';
+import Result, { ResultCode } from './utils/result';
 import { NoPermissionError } from './server/exception';
+import cors from '@koa/cors'
 
 const port = parseInt(process.env.PORT || "3000", 10);
-
-const app = next({ dev });
-const handle = app.getRequestHandler();
-
-app.prepare().then(async () => {
+async function initServer() {
   if (getConfig().initDbWhenStart) {
     await initDb()
   }
@@ -22,6 +18,7 @@ app.prepare().then(async () => {
   const api = apiRouter()
   server.use(async (ctx, next) => {
     try {
+      ctx.status = 200
       ctx.state.user = 'system'
       await next()
     } catch (e: any) {
@@ -33,21 +30,17 @@ app.prepare().then(async () => {
       ctx.body = Result.fail(ResultCode.SERVER_ERROR, null, e?.toString() || 'server error')
     }
   })
+  server.use(cors());
   server.use(bodyparser())
 
   server.use(api.routes())
   server.use(api.allowedMethods())
-  server.use(async ctx => {
-    await handle(ctx.req, ctx.res)
-    ctx.responed = false
-  })
   server.listen(port, () => {
     console.log(
-      `> Server listening at http://localhost:${port} as ${
-        dev ? "development" : process.env.NODE_ENV
+      `> Server listening at http://localhost:${port} as ${dev ? "development" : process.env.NODE_ENV
       }`,
     );
   });
+}
 
-}).catch(console.error);
-
+initServer()

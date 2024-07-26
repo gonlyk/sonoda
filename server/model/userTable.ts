@@ -1,8 +1,8 @@
 import { UserTablePermission } from "../../shared/constant"
 import { Context } from "../../shared/koaContext"
-import { getNowTimeStamp, getQueryer } from "../utils/postgresql"
-import { getConfig } from "../utils/readConfig"
-import { rtf } from "../utils/type"
+import { getNowTimeStamp, getQueryer } from "../../utils/postgresql"
+import { getConfig } from "../../utils/readConfig"
+import { rtf } from "../../utils/type"
 import { BaseModel } from "./base"
 
 
@@ -11,11 +11,11 @@ export class SonodaUserTable extends BaseModel {
   userName?: string
   tableId?: number
   tableName?: string
-  premission?: UserTablePermission
+  permission?: UserTablePermission
 }
 
 const rt = rtf<SonodaUserTable>()
-const _table = `${getConfig().dbPrefix}_user_table`
+export const _table = `${getConfig().dbPrefix}_user_table`
 
 export function insertPermission(ctx: Context) {
   const queryer = getQueryer(ctx)
@@ -47,12 +47,12 @@ export function deletePermissionsByUser(ctx: Context) {
 
 export function deletePermissionsByTable(ctx: Context) {
   const queryer = getQueryer(ctx)
-  return async (name: string) => {
+  return async (tableId: number) => {
     if (!_table) {
-      throw new Error('SonodaUserTable.deletePermissionByTable: tableName required')
+      throw new Error('SonodaUserTable.deletePermissionByTable: tableId required')
     }
     const result = await queryer(_table)
-      .where(rt({ tableName: name }))
+      .where(rt({ tableId }))
       .delete<SonodaUserTable[]>("*")
     return result[0]
   }

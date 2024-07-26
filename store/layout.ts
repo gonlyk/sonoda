@@ -1,8 +1,8 @@
-import { observable, runInAction } from "mobx";
+import { observable, runInAction } from 'mobx';
 
 export const layoutData = observable({
   showFooterHint: false,
-  footerHint: ''
+  footerHint: '',
 })
 
 export function showHint(show: boolean, hint = '') {

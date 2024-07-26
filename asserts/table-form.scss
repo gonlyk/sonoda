@@ -1,0 +1,69 @@
+@import './variables.scss';
+
+.sonoda-create-table {
+  .table-info-form {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+
+    .table-info-content {
+      min-width: 0;
+      flex: 1;
+
+      .table-info-columns {
+        position: relative;
+
+        .ant-collapse-header {
+          position: sticky;
+          top: 64px;
+          background-color: #F5F5F5;
+          z-index: var(--floor-two);
+        }
+      }
+    }
+
+    .table-info-divider {
+      height: auto;
+    }
+
+    .table-info-steps {
+      width: 200px;
+
+      .table-info-steps-content {
+        position: sticky;
+        top: 84px;
+      }
+    }
+  }
+
+  .extra-kv-table {
+    display: table;
+    width: 100%;
+    border: .5px solid #d9d9d9;
+
+    .extra-kv-row {
+      display: table-row;
+      border: .5px solid #d9d9d9;
+
+      .extra-kv-cell {
+        width: 50%;
+        height: 20px;
+        border: .5px solid #d9d9d9;
+        display: table-cell;
+
+        .ant-input {
+          border: none;
+        }
+      }
+    }
+  }
+
+  .extra-tree-item {
+    display: flex;
+    gap: 10px;
+
+    .extra-tree-item-label {
+      min-width: 100px;
+    }
+  }
+}

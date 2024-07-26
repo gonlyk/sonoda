@@ -1,7 +1,8 @@
 import { Context } from "../../shared/koaContext"
-import { getNowTimeStamp, getQueryer } from "../utils/postgresql";
-import { getConfig } from "../utils/readConfig";
-import { rtf } from "../utils/type";
+import { SonodaUserTable, getUserPermissions, _table as permissionTable } from "./userTable";
+import { getNowTimeStamp, getQueryer } from "../../utils/postgresql";
+import { getConfig } from "../../utils/readConfig";
+import { rtf } from "../../utils/type";
 import { BaseModel } from "./base";
 
 export class SonodaTable extends BaseModel {
@@ -9,11 +10,6 @@ export class SonodaTable extends BaseModel {
   title?: string
   columns?: number[]
   comment?: string
-
-  constructor() {
-    super()
-    this.columns = []
-  }
 }
 
 const rt = rtf<SonodaTable>()
@@ -44,7 +40,6 @@ export function updateTable(ctx: Context) {
     const result = await queryer(_table)
       .where(rt({ id: entity.id }))
       .update(rt({
-        name: entity.name,
         title: entity.title,
         columns: entity.columns,
         comment: entity.comment,
@@ -60,18 +55,38 @@ export function updateTable(ctx: Context) {
 
 export function geTables(ctx: Context) {
   const queryer = getQueryer(ctx)
-  return async (page = 1, pageSize = 10): Promise<SonodaTable[]> => {
-    return await queryer(_table)
-      .whereNot(rt({ dataActive: false }))
-      .offset(pageSize * page)
-      .limit(pageSize)
+  return async (permissions: SonodaUserTable[], page?: number, pageSize = 10): Promise<SonodaTable[]> => {
+
+    const selector = queryer(_table)
       .select<SonodaTable[]>()
+      .whereNot(rt({ dataActive: false }))
+      .whereIn('id', permissions.map(per => per.tableId!))
+      .orderBy('createTime', 'desc')
+
+    if (page) {
+      selector
+        .offset(pageSize * (page - 1))
+        .limit(pageSize)
+    }
+    return await selector
+  }
+}
+
+export function getTableCount(ctx: Context) {
+  const queryer = getQueryer(ctx)
+  return async (permissions: SonodaUserTable[]): Promise<number> => {
+    const result = await queryer(_table)
+      .whereNot(rt({ dataActive: false }))
+      .whereIn('id', permissions.map(per => per.tableId!))
+      .count()
+
+    return result[0].count as number
   }
 }
 
 export function getTable(ctx: Context) {
   const queryer = getQueryer(ctx)
-  return async (id: number): Promise<SonodaTable> => {
+  return async (id: number): Promise<SonodaTable | undefined> => {
     const result = await queryer(_table)
       .where(rt({ id }))
       .whereNot(rt({ dataActive: false }))
@@ -83,7 +98,7 @@ export function getTable(ctx: Context) {
 
 export function getTableByName(ctx: Context) {
   const queryer = getQueryer(ctx)
-  return async (name: string): Promise<SonodaTable> => {
+  return async (name: string): Promise<SonodaTable | undefined> => {
     const result = await queryer(_table)
       .where(rt({ name }))
       .whereNot(rt({ dataActive: false }))

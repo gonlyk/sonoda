@@ -1,24 +1,29 @@
 import { BaseModel } from "./base"
-import { ControllerDataType, ControllerType } from "../../shared/controllerType"
-import { getConfig } from "../utils/readConfig"
-import { rtf } from "../utils/type"
+import { ControllerDataTypeMap, ControllerType } from "../../shared/controllerType"
+import { getConfig } from "../../utils/readConfig"
+import { rtf } from "../../utils/type"
 import { Context } from "../../shared/koaContext"
-import { BaseType } from "../../shared/databaseType";
-import { getNowTimeStamp, getQueryer } from "../utils/postgresql";
+import { DatabaseType } from "../../shared/databaseType";
+import { getNowTimeStamp, getQueryer } from "../../utils/postgresql";
 
 export class SonodaColumn extends BaseModel {
   name?: string
   title?: string
-  type?: BaseType
+  type?: DatabaseType
+  typeSize?: number
   increase?: boolean
   required?: boolean
   index?: number
-  default?: {
-    value: any
+  uniqueValue?: boolean
+  defaultValue?: {
+     // sql 不设置默认，给前端使用
+    value?: any
+    // 内置更新模式，createUser 在插入时写入用户名， updateUser 在 修改时写入用户名
+    buildIn?: 'createUser' | 'createTime' | 'updateUser' | 'updateTime'
   }
   controller?: {
     type: ControllerType
-    data?: ControllerDataType[ControllerType]
+    data?: ControllerDataTypeMap[ControllerType]
   }
   comment?: string
   fromTable?: string

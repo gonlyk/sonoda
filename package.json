@@ -4,17 +4,21 @@
   "private": true,
   "main": "dist/server.js",
   "scripts": {
-    "dev": "nodemon",
+    "dev:next": "cross-env PORT=8080 next dev",
+    "dev:server": "nodemon",
     "build:next": "next build",
     "build:server": "tsc --project tsconfig.server.json",
     "start": "next start",
     "deploy": "cross-env NODE_ENV=production node dist/server.js",
     "lint": "next lint --fix",
-    "initdb": "cross-env NODE_ENV=production node dist/initdb.js"
+    "initdb": "cross-env NODE_ENV=production node dist/initdb.js",
+    "test": "ts-node --project tsconfig.server.json test.ts"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.21.0",
     "@ant-design/icons": "^5.3.7",
+    "@ant-design/nextjs-registry": "^1.0.0",
+    "@koa/cors": "^5.0.0",
     "@koa/router": "^12.0.1",
     "antd": "^5.19.1",
     "dayjs": "^1.11.11",
@@ -26,7 +30,7 @@
     "mobx": "^6.13.0",
     "mobx-react": "^9.1.1",
     "mysql2": "^3.10.2",
-    "next": "^12.3.4",
+    "next": "^14.2.5",
     "pg": "^8.12.0",
     "react": "^18",
     "react-dom": "^18",
@@ -37,6 +41,7 @@
   "devDependencies": {
     "@eslint/js": "^9.6.0",
     "@types/koa": "^2.15.0",
+    "@types/koa__cors": "^5.0.0",
     "@types/koa__router": "^12.0.4",
     "@types/koa-bodyparser": "^4.3.12",
     "@types/md5": "^2.3.5",

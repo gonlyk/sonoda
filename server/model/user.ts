@@ -1,17 +1,13 @@
 import { Context } from "../../shared/koaContext"
-import { getNowTimeStamp, getQueryer } from "../utils/postgresql";
-import { getConfig } from "../utils/readConfig";
-import { rtf } from "../utils/type";
+import { getNowTimeStamp, getQueryer } from "../../utils/postgresql";
+import { getConfig } from "../../utils/readConfig";
+import { rtf } from "../../utils/type";
 import { BaseModel } from "./base";
 
 export class SonodaUser extends BaseModel {
   name?: string
   nickname?: string
   password?: string
-
-  constructor() {
-    super()
-  }
 }
 
 const rt = rtf<SonodaUser>()
@@ -60,11 +56,24 @@ export function getUsers(ctx: Context) {
   return async (page = 1, pageSize = 10): Promise<SonodaUser[]> => {
     const result = await queryer(_table)
       .whereNot(rt({ dataActive: false }))
-      .offset(pageSize * page)
+      .offset(pageSize * (page - 1))
       .limit(pageSize)
       .select<SonodaUser[]>()
+      .orderBy('createTime', 'desc')
+
     const users = result.map(user => ({ ...user, password: void 0 }))
     return users
+  }
+}
+
+export function getUserCount(ctx: Context) {
+  const queryer = getQueryer(ctx)
+  return async (): Promise<number> => {
+    const result = await queryer(_table)
+      .whereNot(rt({ dataActive: false }))
+      .count()
+
+    return result[0].count as number
   }
 }
 

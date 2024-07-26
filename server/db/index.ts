@@ -1,10 +1,10 @@
 import Knex from 'knex'
 // @ts-ignore
 import plugin from 'knex-case-converter-plugin';
-import { getConfig } from '../utils/readConfig';
+import { getConfig } from '../../utils/readConfig';
 import * as fs from 'fs'
 import * as path from 'path'
-import { dev } from '../utils/env';
+import { dev } from '../../utils/env';
 
 const { dbHost, dbPort, dbUser, dbPassword, dbDatabase, dbPrefix } = getConfig()
 

@@ -1,5 +1,5 @@
-import { Context } from "../../shared/koaContext";
-import { knex } from "../db";
+import { Context } from "../shared/koaContext";
+import { knex } from "../server/db";
 
 export function getNowTimeStamp() {
   return new Date()

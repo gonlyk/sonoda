@@ -17,14 +17,14 @@ BEGIN
             name VARCHAR(50) UNIQUE NOT NULL,
             nickname VARCHAR(50),
             password VARCHAR(50) NOT NULL,
-            data_active BOOLEAN,
+            data_active BOOLEAN NOT NULL,
             create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             create_user VARCHAR(50) NOT NULL,
             update_user VARCHAR(50) NOT NULL
         )', user_table_name);
-        EXECUTE format('INSERT INTO %I (name, nickname, password, create_user, update_user)
-            VALUES (''system'', ''system'', ''system'', ''system'', ''system'')', user_table_name);
+        EXECUTE format('INSERT INTO %I (name, nickname, password, data_active, create_user, update_user)
+            VALUES (''system'', ''system'', ''system'', true, ''system'', ''system'')', user_table_name);
     END IF;
     IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_name = table_table_name) THEN
         EXECUTE format('CREATE TABLE %I (
@@ -49,7 +49,8 @@ BEGIN
             increase BOOLEAN NOT NULL,
             required BOOLEAN NOT NULL,
             index INTEGER NOT NULL,
-            default JSONB,
+            unique_value BOOLEAN NOT NULL DEFAULT false,
+            default_value JSONB,
             from_table VARCHAR(50) NOT NULL,
             controller JSONB NOT NULL,
             comment VARCHAR(255),
@@ -67,14 +68,14 @@ BEGIN
             user_name VARCHAR(50) NOT NULL,
             table_id INTEGER NOT NULL,
             table_name VARCHAR(50) NOT NULL,
-            premission INTEGER NOT NULL,
+            permission INTEGER NOT NULL,
             data_active BOOLEAN,
             create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             create_user VARCHAR(50) NOT NULL,
             update_user VARCHAR(50) NOT NULL
         )', permisson_table_name);
-        EXECUTE format('COMMENT ON COLUMN %I.premission IS ''1 read, 2 write''', permisson_table_name);
+        EXECUTE format('COMMENT ON COLUMN %I.permission IS ''1 read, 2 write''', permisson_table_name);
     END IF;
 END;
 $$ LANGUAGE plpgsql;

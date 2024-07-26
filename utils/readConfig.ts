@@ -23,8 +23,9 @@ function readConfig(): Config {
     }
 
     try {
-        const configFilePath = path.resolve(process.cwd(), 'sonoda.config.json')
-        const config = JSON.parse(fs.readFileSync(configFilePath, 'utf-8'))
+        const configFilePath = path.resolve(process.cwd(), 'sonoda.config.ts')
+        // const config = JSON.parse(fs.readFileSync(configFilePath, 'utf-8'))
+        const config = require(configFilePath).default
         return Object.assign({}, defaultConfig, config)
     } catch {
 

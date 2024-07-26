@@ -1,23 +1,24 @@
 import Router from "@koa/router";
 import { SonodaUserService } from "../service/user";
-import Result, { ResultCode } from "../utils/result";
-import { isNullOrUndefined } from "../utils/util";
+import Result, { ResultCode } from "../../utils/result";
+import { isNullOrUndefined } from "../../utils/util";
+import { SonodaTableService } from "../service/table";
 
 const userService = new SonodaUserService
+const tableService = new SonodaTableService
 const router = new Router({
   prefix: '/user'
 })
-router.use()
 
-router.get('/', async ctx => {
+router.get('/list', async ctx => {
   const { page, pageSize } = ctx.query
   const p = page ? Number(page) : 1
   const ps = pageSize ? Number(pageSize) : 10
-  const users = await userService.getUsers(ctx)(p, ps)
-  ctx.body = Result.success(users)
+  const [users, count] = await userService.getUsers(ctx)(p, ps)
+  ctx.body = Result.list(p, ps, count, users)
 })
 
-router.post('/', async ctx => {
+router.post('/create', async ctx => {
   const { name, nickname, password } = ctx.request.body as { 
     name?: string,
     nickname?: string,
@@ -50,13 +51,23 @@ router.get('/name/:name', async ctx => {
   ctx.body = Result.success(user)
 })
 
-router.post('/:id', async ctx => {
-  const { id, nickname, password } = ctx.request.body || {} as any
+router.get('/tables', async ctx => {
+  const tables = await tableService.getUserTables(ctx)()
+  ctx.body = Result.success(tables)
+})
+
+router.post('/update', async ctx => {
+  const { id, nickname, password, dataActive } = ctx.request.body as {
+    id?: number,
+    nickname?: string,
+    password?: string,
+    dataActive?: boolean
+  }
   if (!id) {
     ctx.body = Result.fail(ResultCode.PARAM_REQUIRE, null, 'param id required')
     return
   }
-  const user = await userService.updateUser(ctx)(Number(id), nickname, password)
+  const user = await userService.updateUser(ctx)(Number(id), nickname, password, dataActive)
   ctx.body = Result.success(user)
 })
 

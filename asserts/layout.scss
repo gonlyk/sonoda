@@ -1,10 +1,15 @@
+@import './variables.scss';
+
 .header {
   display: flex;
   justify-content: space-between;
   height: 64px;
   line-height: 64px;
   background: white;
-  /* padding: 0 50px; */
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: var(--floor-three);
 }
 .icon {
   height: 64px;
@@ -18,10 +23,17 @@
 .sider {
   background-color: white !important;
   width: 200px;
+
+  .menu {
+    position: sticky;
+    top: 64px;
+    left: 0;
+  }
 }
 
 .content {
   margin: 10px;
+  padding: 10px;
   background-color: white;
   min-height: calc(100vh - 84px);
 }
@@ -33,7 +45,7 @@
   width: 100vw;
   line-height: 14px;
   padding: 0 10px;
-  z-index: var(--floor-two);
+  z-index: var(--floor-three);
   opacity: 0;
   transition: opacity .1s linear;
 }
